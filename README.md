@@ -1,3 +1,3 @@
 # toi-lp
 
-lp.html
+[lp.html](https://sghh02.github.io/toi-lp/lp.html)
