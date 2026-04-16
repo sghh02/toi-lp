@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>toi | 思考のOS を手に入れる</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #0a0a0a;
+      --paper: #f5f2eb;
+      --paper-warm: #ede8dd;
+      --accent: #e8451c;
+      --accent-glow: #ff6b42;
+      --muted: #8a857c;
+      --border: #d4cfc6;
+      --card-bg: rgba(255,255,255,0.6);
+      --font-display: 'Noto Sans JP', sans-serif;
+      --font-body: 'Zen Kaku Gothic New', sans-serif;
+      --font-mono: 'DM Mono', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--paper);
+      color: var(--ink);
+      line-height: 1.8;
+      overflow-x: hidden;
+    }
+
+    /* ─── Grain overlay ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ─── Navigation ─── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 1.2rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(20px);
+      background: rgba(245,242,235,0.85);
+      border-bottom: 1px solid var(--border);
+      transition: all 0.3s ease;
+    }
+
+    nav.scrolled {
+      padding: 0.8rem 2rem;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+    }
+
+    .logo {
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 1.3rem;
+      letter-spacing: 0.05em;
+      color: var(--ink);
+    }
+
+    .logo span { color: var(--accent); }
+
+    .nav-cta {
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 0.6rem 1.5rem;
+      background: var(--ink);
+      color: var(--paper);
+      border: none;
+      border-radius: 100px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .nav-cta:hover {
+      background: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    /* ─── Hero ─── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 8rem 2rem 4rem;
+      position: relative;
+    }
+
+    .hero-inner {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .hero-tag {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.2s forwards;
+    }
+
+    .hero h1 {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: clamp(2.4rem, 6vw, 4.2rem);
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.4s forwards;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      color: var(--accent);
+      position: relative;
+    }
+
+    .hero h1 em::after {
+      content: '';
+      position: absolute;
+      bottom: 0.05em;
+      left: 0;
+      width: 100%;
+      height: 0.12em;
+      background: var(--accent);
+      opacity: 0.2;
+      border-radius: 2px;
+    }
+
+    .hero-desc {
+      font-size: 1.15rem;
+      color: var(--muted);
+      max-width: 600px;
+      line-height: 2;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.6s forwards;
+    }
+
+    .hero-actions {
+      margin-top: 3rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.8s forwards;
+    }
+
+    .btn-primary {
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 1rem 2.5rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 100px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 20px rgba(232,69,28,0.25);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-glow);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(232,69,28,0.35);
+    }
+
+    .btn-ghost {
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 500;
+      padding: 1rem 2.5rem;
+      background: transparent;
+      color: var(--ink);
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--ink);
+      background: var(--ink);
+      color: var(--paper);
+    }
+
+    /* ─── Scroll indicator ─── */
+    .scroll-hint {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 1.2s forwards;
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--muted), transparent);
+      animation: scrollPulse 2s ease infinite;
+    }
+
+    /* ─── Section base ─── */
+    section {
+      padding: 6rem 2rem;
+    }
+
+    .section-inner {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .section-tag {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      line-height: 1.35;
+      letter-spacing: -0.01em;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-lead {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 640px;
+      line-height: 2;
+      margin-bottom: 3rem;
+    }
+
+    /* ─── Problem section ─── */
+    .problem {
+      background: var(--ink);
+      color: var(--paper);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .problem::before {
+      content: '?';
+      position: absolute;
+      top: -0.2em;
+      right: -0.05em;
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 28rem;
+      color: rgba(255,255,255,0.02);
+      pointer-events: none;
+      line-height: 1;
+    }
+
+    .problem .section-tag { color: var(--accent-glow); }
+
+    .problem-cards {
+      display: grid;
+      gap: 1px;
+      margin-top: 2rem;
+    }
+
+    .problem-card {
+      padding: 2rem 0;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      display: grid;
+      grid-template-columns: 3rem 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    .problem-card:last-child {
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .problem-num {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--accent-glow);
+      padding-top: 0.2rem;
+    }
+
+    .problem-card h3 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .problem-card p {
+      color: rgba(245,242,235,0.6);
+      font-size: 0.95rem;
+      line-height: 1.9;
+    }
+
+    /* ─── Framework (Loop) ─── */
+    .framework {
+      background: var(--paper-warm);
+    }
+
+    .loop-visual {
+      display: flex;
+      justify-content: center;
+      margin: 3rem 0;
+    }
+
+    .loop-container {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .loop-step {
+      text-align: center;
+      padding: 2rem 2.5rem;
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+      cursor: default;
+      position: relative;
+    }
+
+    .loop-step:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+      border-color: var(--accent);
+    }
+
+    .loop-step-num {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      margin-bottom: 0.8rem;
+    }
+
+    .loop-step h3 {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .loop-step p {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .loop-arrow {
+      font-size: 1.5rem;
+      color: var(--border);
+      padding: 0 0.8rem;
+      flex-shrink: 0;
+    }
+
+    .loop-return {
+      width: 100%;
+      text-align: center;
+      margin-top: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    .loop-return svg {
+      display: block;
+      margin: 0.5rem auto 0;
+    }
+
+    /* ─── Phases ─── */
+    .phases {
+      background: var(--paper);
+    }
+
+    .phase-timeline {
+      position: relative;
+      padding-left: 3rem;
+    }
+
+    .phase-timeline::before {
+      content: '';
+      position: absolute;
+      left: calc(3rem - 1.5rem - 1px);
+      top: 0.3rem;
+      bottom: 0.3rem;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--accent), var(--border));
+      border-radius: 2px;
+    }
+
+    .phase-item {
+      position: relative;
+      padding-bottom: 3rem;
+    }
+
+    .phase-item:last-child { padding-bottom: 0; }
+
+    .phase-dot {
+      position: absolute;
+      left: calc(-1.5rem - 7px);
+      top: 0.3rem;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 3px solid var(--paper);
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+
+    .phase-item:last-child .phase-dot {
+      background: var(--paper);
+      box-shadow: 0 0 0 2px var(--border);
+    }
+
+    .phase-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      margin-bottom: 0.5rem;
+    }
+
+    .phase-item h3 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .phase-item p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.9;
+    }
+
+    .phase-duration {
+      display: inline-block;
+      margin-top: 0.8rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--ink);
+      background: rgba(10,10,10,0.05);
+      padding: 0.3rem 0.8rem;
+      border-radius: 100px;
+    }
+
+    /* ─── Pricing ─── */
+    .pricing {
+      background: var(--paper-warm);
+    }
+
+    .pricing-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .pricing-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.5rem;
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pricing-card.featured {
+      border-color: var(--accent);
+      box-shadow: 0 8px 40px rgba(232,69,28,0.1);
+    }
+
+    .pricing-card.featured::before {
+      content: '先着5名 限定価格';
+      position: absolute;
+      top: 1.2rem;
+      right: -2.5rem;
+      font-family: var(--font-body);
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #fff;
+      background: var(--accent);
+      padding: 0.3rem 3rem;
+      transform: rotate(35deg);
+    }
+
+    .pricing-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+    }
+
+    .pricing-plan-name {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .pricing-amount {
+      display: flex;
+      align-items: baseline;
+      gap: 0.3rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .pricing-yen {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .pricing-number {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 2.8rem;
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+
+    .pricing-period {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .pricing-note {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .pricing-features {
+      list-style: none;
+      margin-bottom: 2rem;
+    }
+
+    .pricing-features li {
+      font-size: 0.9rem;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .pricing-features li::before {
+      content: '→';
+      font-family: var(--font-mono);
+      color: var(--accent);
+      font-size: 0.8rem;
+    }
+
+    .pricing-card .btn-primary,
+    .pricing-card .btn-ghost {
+      width: 100%;
+      text-align: center;
+      display: block;
+    }
+
+    /* ─── FAQ ─── */
+    .faq-list {
+      margin-top: 2rem;
+    }
+
+    .faq-item {
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 0;
+    }
+
+    .faq-item:last-child {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .faq-question {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      user-select: none;
+      transition: color 0.3s ease;
+    }
+
+    .faq-question:hover { color: var(--accent); }
+
+    .faq-toggle {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      color: var(--muted);
+      transition: transform 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .faq-item.open .faq-toggle {
+      transform: rotate(45deg);
+      color: var(--accent);
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.4s ease;
+    }
+
+    .faq-item.open .faq-answer {
+      max-height: 300px;
+      padding-top: 1rem;
+    }
+
+    .faq-answer p {
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.9;
+    }
+
+    /* ─── CTA ─── */
+    .cta {
+      background: var(--ink);
+      color: var(--paper);
+      text-align: center;
+      padding: 6rem 2rem;
+    }
+
+    .cta .section-tag { color: var(--accent-glow); }
+
+    .cta .section-title {
+      color: var(--paper);
+      margin-bottom: 1rem;
+    }
+
+    .cta p {
+      color: rgba(245,242,235,0.6);
+      max-width: 500px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.9;
+    }
+
+    /* ─── Footer ─── */
+    footer {
+      padding: 3rem 2rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-left {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 2rem;
+    }
+
+    .footer-links a {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .footer-links a:hover { color: var(--ink); }
+
+    /* ─── Tokusho Modal ─── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(8px);
+      z-index: 200;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    .modal-overlay.active { display: flex; }
+
+    .modal-content {
+      background: var(--paper);
+      border-radius: 20px;
+      padding: 2.5rem;
+      max-width: 640px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1.2rem;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--muted);
+      transition: color 0.3s ease;
+    }
+
+    .modal-close:hover { color: var(--ink); }
+
+    .modal-content h2 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.3rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-content table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .modal-content th,
+    .modal-content td {
+      padding: 0.8rem;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .modal-content th {
+      font-weight: 500;
+      color: var(--muted);
+      width: 30%;
+      white-space: nowrap;
+    }
+
+    /* ─── Animations ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 768px) {
+      section { padding: 4rem 1.5rem; }
+
+      .pricing-cards {
+        grid-template-columns: 1fr;
+      }
+
+      .loop-container {
+        flex-direction: column;
+        gap: 0;
+      }
+
+      .loop-arrow {
+        transform: rotate(90deg);
+        padding: 0.5rem 0;
+      }
+
+      .loop-step {
+        width: 100%;
+      }
+
+      footer {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .pricing-card.featured::before {
+        font-size: 0.6rem;
+        right: -2.8rem;
+        top: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav id="nav">
+    <div class="logo">toi</div>
+    <a href="#apply" class="nav-cta">無料相談を予約</a>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-tag">toi by 合同会社Do.</div>
+      <h1>
+        技術を教えない。<br>
+        <em>思考のOS</em>を<br>
+        インストールする。
+      </h1>
+      <p class="hero-desc">
+        未経験からエンジニアへ。AI活用を仕事に。<br>
+        「目的→設計→実行」の思考フレームワークで、<br>
+        最短経路を自分で選べる人になる。
+      </p>
+      <div class="hero-actions">
+        <a href="#apply" class="btn-primary">無料相談に申し込む</a>
+        <a href="#framework" class="btn-ghost">サービスを知る</a>
+      </div>
+    </div>
+    <div class="scroll-hint">
+      SCROLL
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- Problem -->
+  <section class="problem">
+    <div class="section-inner">
+      <div class="section-tag reveal">Problem</div>
+      <h2 class="section-title reveal" style="color: var(--paper);">
+        「何から始めればいいか<br>わからない」の正体
+      </h2>
+      <p class="section-lead reveal" style="color: rgba(245,242,235,0.6);">
+        スキル不足が問題なのではありません。<br>
+        自分がなぜそれを学ぶのか——目的が曖昧なまま進めてしまうことが、挫折の本当の原因です。
+      </p>
+      <div class="problem-cards">
+        <div class="problem-card reveal">
+          <div class="problem-num">01</div>
+          <div>
+            <h3>わからないことが多すぎる</h3>
+            <p>プログラミング言語、フレームワーク、環境構築…。情報の海に溺れて、いつでも挫折できる状態に陥る。</p>
+          </div>
+        </div>
+        <div class="problem-card reveal">
+          <div class="problem-num">02</div>
+          <div>
+            <h3>最短経路が見えない</h3>
+            <p>「なぜそれを学ぶのか」が明確でないと、学ぶべきことの取捨選択ができない。遠回りし続ける。</p>
+          </div>
+        </div>
+        <div class="problem-card reveal">
+          <div class="problem-num">03</div>
+          <div>
+            <h3>走り切れない</h3>
+            <p>目的なき学習は、モチベーションが切れた瞬間に終わる。長期間のマラソンを支える土台がない。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Framework -->
+  <section class="framework" id="framework">
+    <div class="section-inner">
+      <div class="section-tag reveal">Framework</div>
+      <h2 class="section-title reveal">
+        toiが渡すのは、技術ではなく<br>「思考の型」
+      </h2>
+      <p class="section-lead reveal">
+        目的を明確にし、そこから逆算して設計し、実行する。このループを自分で回せるようになれば、学ぶ対象が変わっても、一生使える力になります。
+      </p>
+      <div class="loop-visual reveal">
+        <div class="loop-container">
+          <div class="loop-step">
+            <div class="loop-step-num">STEP 01</div>
+            <h3>目的</h3>
+            <p>なぜやるのか？<br>ゴールを言語化する</p>
+          </div>
+          <div class="loop-arrow">→</div>
+          <div class="loop-step">
+            <div class="loop-step-num">STEP 02</div>
+            <h3>設計</h3>
+            <p>何を、どの順で学ぶか<br>ロードマップを作る</p>
+          </div>
+          <div class="loop-arrow">→</div>
+          <div class="loop-step">
+            <div class="loop-step-num">STEP 03</div>
+            <h3>実行</h3>
+            <p>手を動かし、<br>検証して前に進む</p>
+          </div>
+          <div class="loop-return">
+            <svg width="200" height="30" viewBox="0 0 200 30">
+              <path d="M180 5 Q190 5 190 15 Q190 25 180 25 L20 25 Q10 25 10 15 Q10 5 20 5" fill="none" stroke="#d4cfc6" stroke-width="1.5" stroke-dasharray="4 3"/>
+              <polygon points="15,2 22,5 15,8" fill="#d4cfc6"/>
+            </svg>
+            ループを回し続ける
+          </div>
+        </div>
+      </div>
+      <p class="section-lead reveal" style="text-align:center; max-width: 100%; margin-top: 1rem;">
+        このフレームワークは簡単ではありません。<br>
+        しかし、これを持つことが長期間走り切る上での最大の武器になります。
+      </p>
+    </div>
+  </section>
+
+  <!-- Phases -->
+  <section class="phases" id="phases">
+    <div class="section-inner">
+      <div class="section-tag reveal">How It Works</div>
+      <h2 class="section-title reveal">卒業までの道のり</h2>
+      <p class="section-lead reveal">
+        「このサービスはもういらない」——それが卒業です。自分で学習設計ができる状態を、一緒に目指します。
+      </p>
+      <div class="phase-timeline reveal">
+        <div class="phase-item">
+          <div class="phase-dot"></div>
+          <div class="phase-label">PHASE 1</div>
+          <h3>思考フレームワークの体得</h3>
+          <p>オリジナル教材「問いから始める学び方」を使い、AIと並走しながら「目的→設計→実行」のループを自分の手で回す体験を得ます。</p>
+          <span class="phase-duration">約1ヶ月 — 週1面談×4回</span>
+        </div>
+        <div class="phase-item">
+          <div class="phase-dot"></div>
+          <div class="phase-label">PHASE 2</div>
+          <h3>学習ロードマップの自己設計</h3>
+          <p>あなたのやりたいことから逆算して、学習計画を自分で作成。面談でレビュー・ブラッシュアップし、最初のマイルストーンを設定します。</p>
+          <span class="phase-duration">約1週間</span>
+        </div>
+        <div class="phase-item">
+          <div class="phase-dot"></div>
+          <div class="phase-label">PHASE 3</div>
+          <h3>実行 — マイルストーン達成</h3>
+          <p>ロードマップに沿って自走。週1面談で進捗チェック＋なんでも質問OK。質問の質が「壁打ち」に変わったら、あなたはもう大丈夫。</p>
+          <span class="phase-duration">1〜3ヶ月</span>
+        </div>
+        <div class="phase-item">
+          <div class="phase-dot"></div>
+          <div class="phase-label">卒業後</div>
+          <h3>継続プラン（希望者のみ）</h3>
+          <p>月1回の壁打ち面談。自走はできている、でも定期的にペースメーカーが欲しい方に。</p>
+          <span class="phase-duration">月1面談</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section class="pricing" id="pricing">
+    <div class="section-inner">
+      <div class="section-tag reveal">Pricing</div>
+      <h2 class="section-title reveal">料金プラン</h2>
+      <p class="section-lead reveal">
+        想定期間は2〜4ヶ月。卒業したらこのサービスは不要になる——それが本質です。
+      </p>
+      <div class="pricing-cards reveal">
+        <!-- Main Plan -->
+        <div class="pricing-card featured">
+          <div class="pricing-plan-name">本コース</div>
+          <div class="pricing-amount">
+            <span class="pricing-yen">¥</span>
+            <span class="pricing-number">30,000</span>
+          </div>
+          <div class="pricing-period">/ 月（税別）</div>
+          <p class="pricing-note">初期限定価格・先着5名</p>
+          <ul class="pricing-features">
+            <li>週1回のオンライン面談（30〜60分）</li>
+            <li>初回面談は60分でじっくりヒアリング</li>
+            <li>「問いから始める学び方」教材提供</li>
+            <li>個別ロードマップ設計サポート</li>
+            <li>チャットサポート</li>
+          </ul>
+          <a href="#apply" class="btn-primary">無料相談に申し込む</a>
+        </div>
+        <!-- Continuation Plan -->
+        <div class="pricing-card">
+          <div class="pricing-plan-name">継続プラン</div>
+          <div class="pricing-amount">
+            <span class="pricing-yen">¥</span>
+            <span class="pricing-number">5,000</span>
+          </div>
+          <div class="pricing-period">/ 月（税別）</div>
+          <p class="pricing-note">卒業後の希望者向け</p>
+          <ul class="pricing-features">
+            <li>月1回の壁打ち面談</li>
+            <li>自走のペースメーカーとして</li>
+          </ul>
+          <a href="#apply" class="btn-ghost">卒業後に申し込み可能</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Target -->
+  <section class="phases" id="target">
+    <div class="section-inner">
+      <div class="section-tag reveal">Who Is This For</div>
+      <h2 class="section-title reveal">こんな方に</h2>
+      <div class="phase-timeline reveal">
+        <div class="phase-item">
+          <div class="phase-dot"></div>
+          <h3>未経験からエンジニアになりたい方</h3>
+          <p>プログラミングの学習を始めたいけれど、何から手をつけていいかわからない。独学で挫折した経験がある方も。</p>
+        </div>
+        <div class="phase-item">
+          <div class="phase-dot"></div>
+          <h3>AIを仕事に活かしたい非エンジニアの方</h3>
+          <p>ChatGPTやその他のAIツールを使いこなしたいけれど、学習の進め方がわからない。漠然と「AIを学びたい」と感じている方に。</p>
+        </div>
+        <div class="phase-item">
+          <div class="phase-dot"></div>
+          <h3>学習にコミットする覚悟がある方</h3>
+          <p>週1回の面談と、その間の自走が前提です。受け身ではなく、自分の頭で考えて前に進む意志がある方をお待ちしています。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq" id="faq">
+    <div class="section-inner">
+      <div class="section-tag reveal">FAQ</div>
+      <h2 class="section-title reveal">よくある質問</h2>
+      <div class="faq-list reveal">
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            プログラミング経験が全くなくても大丈夫ですか？
+            <span class="faq-toggle">+</span>
+          </div>
+          <div class="faq-answer">
+            <p>はい。むしろ未経験の方がメインターゲットです。最初に技術を教えるのではなく、「なぜ学ぶのか」から一緒に整理するので、知識ゼロの状態から始められます。</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            面談はどのように行いますか？
+            <span class="faq-toggle">+</span>
+          </div>
+          <div class="faq-answer">
+            <p>Google Meetを使ったオンライン面談です。初回は60分、2回目以降は30〜60分で実施します。日程は相談の上で決定します。</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            途中で退会できますか？
+            <span class="faq-toggle">+</span>
+          </div>
+          <div class="faq-answer">
+            <p>はい。月額制のため、いつでも退会可能です。ただし、フレームワークの効果を実感するためにも最低2ヶ月の継続を推奨しています。</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            具体的に何ができるようになりますか？
+            <span class="faq-toggle">+</span>
+          </div>
+          <div class="faq-answer">
+            <p>エンジニアコースの場合はポートフォリオアプリの完成、AI活用コースの場合は自分の業務にAIを組み込んだ運用——など、あなたの目的に合わせたマイルストーンを一緒に設定します。大切なのは、それ以降も自分で学習を設計し続けられる力が身につくことです。</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            「質問の質が変わったら卒業」とは？
+            <span class="faq-toggle">+</span>
+          </div>
+          <div class="faq-answer">
+            <p>最初は「何がわからないかわからない」状態でも、フレームワークが身につくと「自分で調べた上で、この判断が合っているか確認したい」という質問に変わります。質問が「答えを求めるもの」から「壁打ち」に変わったら、もう自走できている証拠です。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta" id="apply">
+    <div class="section-inner">
+      <div class="section-tag reveal">Get Started</div>
+      <h2 class="section-title reveal">まずは無料相談から</h2>
+      <p class="reveal">
+        30分の無料相談で、あなたの「なぜ？」を一緒に整理します。<br>
+        無理な勧誘は一切ありません。
+      </p>
+      <a href="https://forms.gle/YOUR_FORM_ID" target="_blank" class="btn-primary reveal" style="display: inline-block;">
+        無料相談を予約する
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-left">© 2026 合同会社Do.</div>
+    <div class="footer-links">
+      <a href="#" onclick="event.preventDefault(); openTokusho();">特定商取引法に基づく表記</a>
+    </div>
+  </footer>
+
+  <!-- Tokusho Modal -->
+  <div class="modal-overlay" id="tokushoModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeTokusho()">×</button>
+      <h2>特定商取引法に基づく表記</h2>
+      <table>
+        <tr><th>事業者名</th><td>合同会社Do.</td></tr>
+        <tr><th>代表者</th><td>坂田 海斗</td></tr>
+        <tr><th>所在地</th><td>東京都渋谷区（詳細はお問い合わせ時にお知らせいたします）</td></tr>
+        <tr><th>連絡先</th><td>メールにてお問い合わせください（申込フォームに記載）</td></tr>
+        <tr><th>サービス料金</th><td>本コース：月額30,000円（税別）/ 継続プラン：月額5,000円（税別）</td></tr>
+        <tr><th>支払方法</th><td>クレジットカード決済（Stripe）</td></tr>
+        <tr><th>支払時期</th><td>初回面談後、月額課金開始</td></tr>
+        <tr><th>サービス提供時期</th><td>お申し込み後、初回面談日程確定後から開始</td></tr>
+        <tr><th>返品・キャンセル</th><td>月額制のため、いつでも解約可能です。日割り返金はいたしかねます。</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // Nav scroll effect
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    // Reveal on scroll
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+    reveals.forEach(el => observer.observe(el));
+
+    // FAQ toggle
+    function toggleFaq(el) {
+      const item = el.closest('.faq-item');
+      const wasOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+      if (!wasOpen) item.classList.add('open');
+    }
+
+    // Tokusho modal
+    function openTokusho() {
+      document.getElementById('tokushoModal').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeTokusho() {
+      document.getElementById('tokushoModal').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('tokushoModal').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) closeTokusho();
+    });
+  </script>
+
+</body>
+</html>
