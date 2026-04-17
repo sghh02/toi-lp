@@ -13,10 +13,14 @@
       --paper: #f5f2eb;
       --paper-warm: #ede8dd;
       --accent: #e8451c;
+      --accent-ink: #b8320f;        /* 小サイズ本文で AA を満たすアクセント */
       --accent-glow: #ff6b42;
-      --muted: #8a857c;
+      --muted: #7a7268;             /* paper/paper-warm 上で AA を満たす中間色 */
       --border: #d4cfc6;
       --card-bg: rgba(255,255,255,0.6);
+      --container-max: 1120px;      /* nav / フッターなど幅広の外枠 */
+      --content-max: 900px;         /* セクション内コンテンツの共通幅 */
+      --nav-height: 4.5rem;
       --font-display: 'Noto Sans JP', sans-serif;
       --font-body: 'Zen Kaku Gothic New', sans-serif;
       --font-mono: 'DM Mono', monospace;
@@ -44,7 +48,7 @@
       top: 0; left: 0; width: 100%; height: 100%;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
       pointer-events: none;
-      z-index: 9999;
+      z-index: 1;
     }
 
     /* ─── Navigation ─── */
@@ -53,13 +57,19 @@
       top: 0; left: 0; right: 0;
       z-index: 100;
       padding: 1.2rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
       backdrop-filter: blur(20px);
       background: rgba(245,242,235,0.85);
       border-bottom: 1px solid var(--border);
-      transition: all 0.3s ease;
+      transition: padding 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .nav-inner {
+      max-width: var(--container-max);
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
     }
 
     nav.scrolled {
@@ -73,6 +83,7 @@
       font-size: 1.3rem;
       letter-spacing: 0.05em;
       color: var(--ink);
+      text-decoration: none;
     }
 
     .logo span { color: var(--accent); }
@@ -107,14 +118,14 @@
     }
 
     .hero-inner {
-      max-width: 900px;
+      max-width: var(--content-max);
       margin: 0 auto;
     }
 
     .hero-tag {
       font-family: var(--font-mono);
       font-size: 0.8rem;
-      color: var(--accent);
+      color: var(--accent-ink);
       letter-spacing: 0.15em;
       text-transform: uppercase;
       margin-bottom: 2rem;
@@ -210,48 +221,29 @@
       color: var(--paper);
     }
 
-    /* ─── Scroll indicator ─── */
-    .scroll-hint {
-      position: absolute;
-      bottom: 2rem;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.5rem;
-      color: var(--muted);
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      letter-spacing: 0.1em;
-      opacity: 0;
-      animation: fadeUp 0.8s ease 1.2s forwards;
-    }
-
-    .scroll-line {
-      width: 1px;
-      height: 40px;
-      background: linear-gradient(to bottom, var(--muted), transparent);
-      animation: scrollPulse 2s ease infinite;
-    }
-
     /* ─── Section base ─── */
     section {
       padding: 6rem 2rem;
     }
 
+    section[id] {
+      scroll-margin-top: calc(var(--nav-height) + 0.5rem);
+    }
+
     .section-inner {
-      max-width: 900px;
+      max-width: var(--content-max);
       margin: 0 auto;
     }
 
     .section-tag {
       font-family: var(--font-mono);
       font-size: 0.75rem;
-      color: var(--accent);
+      font-weight: 500;
+      color: var(--accent-ink);
       letter-spacing: 0.15em;
       text-transform: uppercase;
-      margin-bottom: 1rem;
+      width: fit-content;
+      margin: 0 auto 1rem;
     }
 
     .section-title {
@@ -260,7 +252,9 @@
       font-size: clamp(1.6rem, 4vw, 2.4rem);
       line-height: 1.35;
       letter-spacing: -0.01em;
-      margin-bottom: 1.5rem;
+      width: fit-content;
+      max-width: 100%;
+      margin: 0 auto 1.5rem;
     }
 
     .section-lead {
@@ -268,7 +262,7 @@
       color: var(--muted);
       max-width: 640px;
       line-height: 2;
-      margin-bottom: 3rem;
+      margin: 0 auto 3rem;
     }
 
     /* ─── Problem section ─── */
@@ -293,6 +287,19 @@
     }
 
     .problem .section-tag { color: var(--accent-glow); }
+    .problem .section-title { color: var(--paper); }
+    .problem .section-lead { color: rgba(245,242,235,0.6); }
+
+    .problem .section-tag,
+    .problem .section-title,
+    .problem .section-lead {
+      width: auto;
+      max-width: 100%;
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    .problem .section-lead { max-width: 640px; }
 
     .problem-cards {
       display: grid;
@@ -338,6 +345,10 @@
       background: var(--paper-warm);
     }
 
+    .framework-closer {
+      margin: 1rem auto 0;
+    }
+
     .loop-visual {
       display: flex;
       justify-content: center;
@@ -373,7 +384,7 @@
     .loop-step-num {
       font-family: var(--font-mono);
       font-size: 0.7rem;
-      color: var(--accent);
+      color: var(--accent-ink);
       letter-spacing: 0.1em;
       margin-bottom: 0.8rem;
     }
@@ -420,13 +431,15 @@
 
     .phase-timeline {
       position: relative;
-      padding-left: 3rem;
+      padding-left: 2rem;
+      margin: 2rem auto 0;
+      max-width: 620px;
     }
 
     .phase-timeline::before {
       content: '';
       position: absolute;
-      left: calc(3rem - 1.5rem - 1px);
+      left: 6px;
       top: 0.3rem;
       bottom: 0.3rem;
       width: 2px;
@@ -443,7 +456,7 @@
 
     .phase-dot {
       position: absolute;
-      left: calc(-1.5rem - 7px);
+      left: calc(-2rem + 1px);
       top: 0.3rem;
       width: 14px;
       height: 14px;
@@ -461,7 +474,8 @@
     .phase-label {
       font-family: var(--font-mono);
       font-size: 0.75rem;
-      color: var(--accent);
+      font-weight: 500;
+      color: var(--accent-ink);
       letter-spacing: 0.1em;
       margin-bottom: 0.5rem;
     }
@@ -488,6 +502,66 @@
       background: rgba(10,10,10,0.05);
       padding: 0.3rem 0.8rem;
       border-radius: 100px;
+    }
+
+    /* ─── Target (Who is this for) ─── */
+    .target {
+      background: var(--paper);
+    }
+
+    .target-list {
+      display: grid;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .target-item {
+      display: grid;
+      grid-template-columns: 2.25rem 1fr;
+      gap: 1.25rem;
+      align-items: start;
+      padding: 1.5rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      transition: border-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .target-item:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .target-check {
+      width: 2.25rem;
+      height: 2.25rem;
+      border-radius: 50%;
+      background: var(--paper-warm);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-ink);
+      flex-shrink: 0;
+    }
+
+    .target-check svg {
+      width: 1.1rem;
+      height: 1.1rem;
+    }
+
+    .target-item h3 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.05rem;
+      margin-bottom: 0.4rem;
+      line-height: 1.5;
+    }
+
+    .target-item p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.9;
     }
 
     /* ─── Pricing ─── */
@@ -632,31 +706,49 @@
       gap: 1rem;
       user-select: none;
       transition: color 0.3s ease;
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 0;
+      text-align: left;
+      color: inherit;
+      line-height: 1.6;
     }
 
-    .faq-question:hover { color: var(--accent); }
+    .faq-question:hover,
+    .faq-question:focus-visible { color: var(--accent-ink); }
+    .faq-question:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
+      border-radius: 4px;
+    }
 
     .faq-toggle {
       font-family: var(--font-mono);
       font-size: 1.2rem;
       color: var(--muted);
-      transition: transform 0.3s ease;
+      transition: transform 0.3s ease, color 0.3s ease;
       flex-shrink: 0;
     }
 
     .faq-item.open .faq-toggle {
       transform: rotate(45deg);
-      color: var(--accent);
+      color: var(--accent-ink);
     }
 
     .faq-answer {
-      max-height: 0;
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.4s ease;
+    }
+
+    .faq-answer > * {
+      min-height: 0;
       overflow: hidden;
-      transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.4s ease;
     }
 
     .faq-item.open .faq-answer {
-      max-height: 300px;
+      grid-template-rows: 1fr;
       padding-top: 1rem;
     }
 
@@ -710,14 +802,26 @@
       gap: 2rem;
     }
 
-    .footer-links a {
+    .footer-links a,
+    .footer-link-btn {
+      font-family: var(--font-body);
       font-size: 0.8rem;
       color: var(--muted);
       text-decoration: none;
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
       transition: color 0.3s ease;
     }
 
-    .footer-links a:hover { color: var(--ink); }
+    .footer-links a:hover,
+    .footer-link-btn:hover { color: var(--ink); }
+    .footer-link-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
+      border-radius: 4px;
+    }
 
     /* ─── Tokusho Modal ─── */
     .modal-overlay {
@@ -793,11 +897,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    @keyframes scrollPulse {
-      0%, 100% { opacity: 0.4; }
-      50% { opacity: 1; }
-    }
-
     .reveal {
       opacity: 0;
       transform: translateY(30px);
@@ -810,13 +909,7 @@
     }
 
     /* ─── Responsive ─── */
-    @media (max-width: 768px) {
-      section { padding: 4rem 1.5rem; }
-
-      .pricing-cards {
-        grid-template-columns: 1fr;
-      }
-
+    @media (max-width: 960px) {
       .loop-container {
         flex-direction: column;
         gap: 0;
@@ -830,6 +923,16 @@
       .loop-step {
         width: 100%;
       }
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.5rem; }
+      nav.scrolled { padding: 0.7rem 1.5rem; }
+      section { padding: 4rem 1.5rem; }
+
+      .pricing-cards {
+        grid-template-columns: 1fr;
+      }
 
       footer {
         flex-direction: column;
@@ -842,14 +945,32 @@
         top: 1rem;
       }
     }
+
+    @media (max-height: 680px) {
+      .hero { padding-top: 6rem; padding-bottom: 3rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+      }
+      .reveal { opacity: 1; transform: none; }
+    }
   </style>
 </head>
 <body>
 
   <!-- Navigation -->
   <nav id="nav">
-    <div class="logo">toi</div>
-    <a href="#apply" class="nav-cta">無料相談を予約</a>
+    <div class="nav-inner">
+      <a href="#" class="logo" aria-label="toi ホーム">toi</a>
+      <a href="#apply" class="nav-cta">無料相談を予約</a>
+    </div>
   </nav>
 
   <!-- Hero -->
@@ -871,20 +992,16 @@
         <a href="#framework" class="btn-ghost">サービスを知る</a>
       </div>
     </div>
-    <div class="scroll-hint">
-      SCROLL
-      <div class="scroll-line"></div>
-    </div>
   </section>
 
   <!-- Problem -->
   <section class="problem">
     <div class="section-inner">
       <div class="section-tag reveal">Problem</div>
-      <h2 class="section-title reveal" style="color: var(--paper);">
+      <h2 class="section-title reveal">
         「何から始めればいいか<br>わからない」の正体
       </h2>
-      <p class="section-lead reveal" style="color: rgba(245,242,235,0.6);">
+      <p class="section-lead reveal">
         スキル不足が問題なのではありません。<br>
         自分がなぜそれを学ぶのか——目的が曖昧なまま進めてしまうことが、挫折の本当の原因です。
       </p>
@@ -952,7 +1069,7 @@
           </div>
         </div>
       </div>
-      <p class="section-lead reveal" style="text-align:center; max-width: 100%; margin-top: 1rem;">
+      <p class="section-lead framework-closer reveal">
         このフレームワークは簡単ではありません。<br>
         しかし、これを持つことが長期間走り切る上での最大の武器になります。
       </p>
@@ -1047,25 +1164,37 @@
   </section>
 
   <!-- Target -->
-  <section class="phases" id="target">
+  <section class="target" id="target">
     <div class="section-inner">
       <div class="section-tag reveal">Who Is This For</div>
       <h2 class="section-title reveal">こんな方に</h2>
-      <div class="phase-timeline reveal">
-        <div class="phase-item">
-          <div class="phase-dot"></div>
-          <h3>未経験からエンジニアになりたい方</h3>
-          <p>プログラミングの学習を始めたいけれど、何から手をつけていいかわからない。独学で挫折した経験がある方も。</p>
+      <div class="target-list reveal">
+        <div class="target-item">
+          <div class="target-check" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 10 18 20 6"/></svg>
+          </div>
+          <div>
+            <h3>未経験からエンジニアになりたい方</h3>
+            <p>プログラミングの学習を始めたいけれど、何から手をつけていいかわからない。独学で挫折した経験がある方も。</p>
+          </div>
         </div>
-        <div class="phase-item">
-          <div class="phase-dot"></div>
-          <h3>AIを仕事に活かしたい非エンジニアの方</h3>
-          <p>ChatGPTやその他のAIツールを使いこなしたいけれど、学習の進め方がわからない。漠然と「AIを学びたい」と感じている方に。</p>
+        <div class="target-item">
+          <div class="target-check" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 10 18 20 6"/></svg>
+          </div>
+          <div>
+            <h3>AIを仕事に活かしたい非エンジニアの方</h3>
+            <p>ChatGPTやその他のAIツールを使いこなしたいけれど、学習の進め方がわからない。漠然と「AIを学びたい」と感じている方に。</p>
+          </div>
         </div>
-        <div class="phase-item">
-          <div class="phase-dot"></div>
-          <h3>学習にコミットする覚悟がある方</h3>
-          <p>週1回の面談と、その間の自走が前提です。受け身ではなく、自分の頭で考えて前に進む意志がある方をお待ちしています。</p>
+        <div class="target-item">
+          <div class="target-check" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 10 18 20 6"/></svg>
+          </div>
+          <div>
+            <h3>学習にコミットする覚悟がある方</h3>
+            <p>週1回の面談と、その間の自走が前提です。受け身ではなく、自分の頭で考えて前に進む意志がある方をお待ちしています。</p>
+          </div>
         </div>
       </div>
     </div>
@@ -1078,47 +1207,47 @@
       <h2 class="section-title reveal">よくある質問</h2>
       <div class="faq-list reveal">
         <div class="faq-item">
-          <div class="faq-question" onclick="toggleFaq(this)">
+          <button type="button" class="faq-question" aria-expanded="false" aria-controls="faq-a-1">
             プログラミング経験が全くなくても大丈夫ですか？
-            <span class="faq-toggle">+</span>
-          </div>
-          <div class="faq-answer">
+            <span class="faq-toggle" aria-hidden="true">+</span>
+          </button>
+          <div class="faq-answer" id="faq-a-1" role="region">
             <p>はい。むしろ未経験の方がメインターゲットです。最初に技術を教えるのではなく、「なぜ学ぶのか」から一緒に整理するので、知識ゼロの状態から始められます。</p>
           </div>
         </div>
         <div class="faq-item">
-          <div class="faq-question" onclick="toggleFaq(this)">
+          <button type="button" class="faq-question" aria-expanded="false" aria-controls="faq-a-2">
             面談はどのように行いますか？
-            <span class="faq-toggle">+</span>
-          </div>
-          <div class="faq-answer">
+            <span class="faq-toggle" aria-hidden="true">+</span>
+          </button>
+          <div class="faq-answer" id="faq-a-2" role="region">
             <p>Google Meetを使ったオンライン面談です。初回は60分、2回目以降は30〜60分で実施します。日程は相談の上で決定します。</p>
           </div>
         </div>
         <div class="faq-item">
-          <div class="faq-question" onclick="toggleFaq(this)">
+          <button type="button" class="faq-question" aria-expanded="false" aria-controls="faq-a-3">
             途中で退会できますか？
-            <span class="faq-toggle">+</span>
-          </div>
-          <div class="faq-answer">
+            <span class="faq-toggle" aria-hidden="true">+</span>
+          </button>
+          <div class="faq-answer" id="faq-a-3" role="region">
             <p>はい。月額制のため、いつでも退会可能です。ただし、フレームワークの効果を実感するためにも最低2ヶ月の継続を推奨しています。</p>
           </div>
         </div>
         <div class="faq-item">
-          <div class="faq-question" onclick="toggleFaq(this)">
+          <button type="button" class="faq-question" aria-expanded="false" aria-controls="faq-a-4">
             具体的に何ができるようになりますか？
-            <span class="faq-toggle">+</span>
-          </div>
-          <div class="faq-answer">
+            <span class="faq-toggle" aria-hidden="true">+</span>
+          </button>
+          <div class="faq-answer" id="faq-a-4" role="region">
             <p>エンジニアコースの場合はポートフォリオアプリの完成、AI活用コースの場合は自分の業務にAIを組み込んだ運用——など、あなたの目的に合わせたマイルストーンを一緒に設定します。大切なのは、それ以降も自分で学習を設計し続けられる力が身につくことです。</p>
           </div>
         </div>
         <div class="faq-item">
-          <div class="faq-question" onclick="toggleFaq(this)">
+          <button type="button" class="faq-question" aria-expanded="false" aria-controls="faq-a-5">
             「質問の質が変わったら卒業」とは？
-            <span class="faq-toggle">+</span>
-          </div>
-          <div class="faq-answer">
+            <span class="faq-toggle" aria-hidden="true">+</span>
+          </button>
+          <div class="faq-answer" id="faq-a-5" role="region">
             <p>最初は「何がわからないかわからない」状態でも、フレームワークが身につくと「自分で調べた上で、この判断が合っているか確認したい」という質問に変わります。質問が「答えを求めるもの」から「壁打ち」に変わったら、もう自走できている証拠です。</p>
           </div>
         </div>
@@ -1135,7 +1264,8 @@
         30分の無料相談で、あなたの「なぜ？」を一緒に整理します。<br>
         無理な勧誘は一切ありません。
       </p>
-      <a href="https://forms.gle/YOUR_FORM_ID" target="_blank" class="btn-primary reveal" style="display: inline-block;">
+      <!-- TODO: 実運用時に YOUR_FORM_ID を本物の Google Forms / Stripe / LINE 申込URLへ置換すること -->
+      <a href="https://forms.gle/YOUR_FORM_ID" target="_blank" rel="noopener" class="btn-primary reveal" style="display: inline-block;">
         無料相談を予約する
       </a>
     </div>
@@ -1145,15 +1275,15 @@
   <footer>
     <div class="footer-left">© 2026 合同会社Do.</div>
     <div class="footer-links">
-      <a href="#" onclick="event.preventDefault(); openTokusho();">特定商取引法に基づく表記</a>
+      <button type="button" class="footer-link-btn" onclick="openTokusho()">特定商取引法に基づく表記</button>
     </div>
   </footer>
 
   <!-- Tokusho Modal -->
-  <div class="modal-overlay" id="tokushoModal">
-    <div class="modal-content">
-      <button class="modal-close" onclick="closeTokusho()">×</button>
-      <h2>特定商取引法に基づく表記</h2>
+  <div class="modal-overlay" id="tokushoModal" role="dialog" aria-modal="true" aria-labelledby="tokushoTitle" aria-hidden="true">
+    <div class="modal-content" role="document">
+      <button class="modal-close" type="button" aria-label="閉じる" onclick="closeTokusho()">×</button>
+      <h2 id="tokushoTitle">特定商取引法に基づく表記</h2>
       <table>
         <tr><th>事業者名</th><td>合同会社Do.</td></tr>
         <tr><th>代表者</th><td>坂田 海斗</td></tr>
@@ -1187,27 +1317,53 @@
 
     reveals.forEach(el => observer.observe(el));
 
-    // FAQ toggle
-    function toggleFaq(el) {
-      const item = el.closest('.faq-item');
-      const wasOpen = item.classList.contains('open');
-      document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
-      if (!wasOpen) item.classList.add('open');
-    }
+    // FAQ accordion (accessible)
+    // 高さは CSS の grid-template-rows: 0fr → 1fr トリックで制御
+    document.querySelectorAll('.faq-question').forEach((btn) => {
+      const item = btn.closest('.faq-item');
+      btn.addEventListener('click', () => {
+        const willOpen = !item.classList.contains('open');
+        document.querySelectorAll('.faq-item.open').forEach((openItem) => {
+          openItem.classList.remove('open');
+          openItem.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+        });
+        if (willOpen) {
+          item.classList.add('open');
+          btn.setAttribute('aria-expanded', 'true');
+        }
+      });
+    });
 
-    // Tokusho modal
+    // Tokusho modal (accessible)
+    const tokushoModal = document.getElementById('tokushoModal');
+    let tokushoLastFocus = null;
+
     function openTokusho() {
-      document.getElementById('tokushoModal').classList.add('active');
+      tokushoLastFocus = document.activeElement;
+      tokushoModal.classList.add('active');
+      tokushoModal.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
+      const closeBtn = tokushoModal.querySelector('.modal-close');
+      if (closeBtn) closeBtn.focus();
     }
 
     function closeTokusho() {
-      document.getElementById('tokushoModal').classList.remove('active');
+      tokushoModal.classList.remove('active');
+      tokushoModal.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
+      if (tokushoLastFocus && typeof tokushoLastFocus.focus === 'function') {
+        tokushoLastFocus.focus();
+      }
     }
 
-    document.getElementById('tokushoModal').addEventListener('click', (e) => {
+    tokushoModal.addEventListener('click', (e) => {
       if (e.target === e.currentTarget) closeTokusho();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && tokushoModal.classList.contains('active')) {
+        closeTokusho();
+      }
     });
   </script>
 
